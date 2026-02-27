@@ -2,8 +2,10 @@ const mainInput = document.querySelector("#input-item");
 const form = document.querySelector("form");
 const itemsList = document.querySelector("ul");
 
+let itemCounter = 5;
+
 mainInput.addEventListener("input", () => {
-  const sanitizer = "/^[a-zA-ZÀ-ÿs]$/";
+  const sanitizer = /[^a-zA-ZÀ-ÿ\s]/g;
 
   mainInput.value.replace(sanitizer, "");
 });
@@ -20,16 +22,21 @@ form.onsubmit = (event) => {
 
   const newItem = createListItem(itemText);
   itemsList.appendChild(newItem);
+
+  mainInput.value = "";
 };
 
 function createListItem(itemText) {
   const li = document.createElement("li");
   li.className = "item-card";
 
+  const itemId = `item-${itemCounter++}`;
+  li.id = itemId;
+
   li.innerHTML = `
             <div class="item-content">
-              <input type="checkbox" id="item-1" />
-              <label for="item-1">
+              <input type="checkbox" id="${itemId}-checkbox" />
+              <label for=${itemId}-checkbox>
                 <span>${itemText}</span>
               </label>
             </div>
@@ -50,3 +57,26 @@ function createListItem(itemText) {
 
   return li;
 }
+
+function deleteCardById(itemId) {
+  const itemToRemove = document.getElementById(itemId);
+
+  if (itemToRemove) {
+    itemToRemove.remove();
+    //Mostrar mensagem;
+    return true;
+  }
+
+  alert(`Item com ID ${itemId} não encontrado`);
+  return false;
+}
+
+itemsList.addEventListener("click", (event) => {
+  const removeButton = event.target.closest("li");
+
+  if (removeButton) {
+    const listItem = removeButton.closest("li");
+    const itemId = listItem.id;
+    deleteCardById(itemId);
+  }
+});
